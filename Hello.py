@@ -18,15 +18,13 @@ def backtest_var(data, confidence_level, holding_period, investment):
     returns = data.pct_change().dropna()
     var_series = []
     breaches = 0
-    
-    for i in range(len(returns)):
-        if i < holding_period:
-            continue
-        var = np.percentile(returns[i-holding_period:i], 100 * (1 - confidence_level))
+
+    for i in range(holding_period, len(returns)):
+        var = np.percentile(returns.iloc[i-holding_period:i], 100 * (1 - confidence_level))
         var_series.append(var)
         if returns.iloc[i] < var:
             breaches += 1
-    
+
     var_series = pd.Series(var_series, index=returns.index[holding_period:])
     return var_series, breaches
 
@@ -70,7 +68,7 @@ if len(stocks) > 0:
             
             fig, ax = plt.subplots()
             data.pct_change().plot(ax=ax, label='Retornos Diários')
-            pd.Series(var_series, index=data.index[-len(var_series):]).plot(ax=ax, label='VaR')
+            var_series.plot(ax=ax, label='VaR')
             ax.legend()
             st.pyplot(fig)
             
@@ -81,5 +79,3 @@ else:
     st.warning("Por favor, selecione pelo menos uma ação.")
 
 # Rodar a aplicação com `streamlit run app.py`
-
-
