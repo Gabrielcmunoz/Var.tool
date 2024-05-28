@@ -51,7 +51,7 @@ confidence_level = st.sidebar.slider("Intervalo de Confiança:", min_value=0.90,
 holding_period = st.sidebar.number_input("Período de Retenção (dias):", min_value=1, max_value=252, value=10)
 
 # Download dos dados
-if stocks:
+if len(stocks) > 0:
     try:
         data = yf.download(stocks, start="2020-01-01", end=datetime.today().strftime('%Y-%m-%d'), progress=False)['Adj Close']
         st.header("Dados das Ações Selecionadas")
@@ -74,5 +74,7 @@ if stocks:
         st.write(f"Número de violações: {breaches}")
     except Exception as e:
         st.error(f"Erro ao baixar os dados: {e}")
+else:
+    st.warning("Por favor, selecione pelo menos uma ação.")
 
 # Rodar a aplicação com `streamlit run app.py`
