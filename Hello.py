@@ -31,12 +31,14 @@ def backtest_var(returns, confidence_level, holding_period, investment):
 st.title("Sistema de VaR para Ativos Lineares")
 st.sidebar.header("Configurações")
 
-# Seleção das ações do Yahoo Finance
-stocks = st.sidebar.multiselect(
-    'Selecione as ações:',
-    ('AAPL', 'GOOGL', 'MSFT', 'AMZN', 'FB', 'TSLA', 'BRK-A', 'V', 'JNJ', 'WMT'),
-    ('AAPL', 'MSFT')
+# Input do símbolo das ações do Yahoo Finance
+stocks_input = st.sidebar.text_input(
+    'Digite os símbolos das ações separados por espaço:',
+    'AAPL MSFT'
 )
+
+# Convertendo a string de entrada em uma lista de ações
+stocks = stocks_input.split()
 
 # Input de exposição (valor aplicado)
 investment = st.sidebar.number_input("Exposição (valor aplicado):", min_value=0.0, value=10000.0)
@@ -78,6 +80,6 @@ if len(stocks) > 0:
     except Exception as e:
         st.error(f"Erro ao baixar os dados: {e}")
 else:
-    st.warning("Por favor, selecione pelo menos uma ação.")
+    st.warning("Por favor, digite pelo menos um símbolo de ação.")
 
 # Rodar a aplicação com `streamlit run app.py`
