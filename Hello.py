@@ -54,7 +54,7 @@ holding_period = st.sidebar.number_input("Período de Retenção (dias):", min_v
 if len(stocks) > 0:
     try:
         data = yf.download(stocks, start="2020-01-01", end=datetime.today().strftime('%Y-%m-%d'), progress=False)['Adj Close']
-        if data.empty:
+        if data is None or data.empty:
             st.error("Erro ao baixar os dados: Nenhum dado retornado.")
         else:
             st.header("Dados das Ações Selecionadas")
@@ -70,7 +70,7 @@ if len(stocks) > 0:
             
             fig, ax = plt.subplots()
             data.pct_change().plot(ax=ax, label='Retornos Diários')
-            var_series.plot(ax=ax, label='VaR')
+            pd.Series(var_series, index=data.index[-len(var_series):]).plot(ax=ax, label='VaR')
             ax.legend()
             st.pyplot(fig)
             
