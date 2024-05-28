@@ -28,7 +28,10 @@ def backtest_var(returns, confidence_level, holding_period, investment):
     return var_series, breaches
 
 # Configuração da página
-st.title("Sistema de VaR para Ativos Lineares")
+st.set_page_config(page_title="Sistema de VaR para Ativos Lineares", layout="wide")
+st.title("Sistema de Valor em Risco (VaR) para Ativos Lineares")
+
+# Barra lateral com as configurações
 st.sidebar.header("Configurações")
 
 # Input do símbolo das ações do Yahoo Finance
@@ -56,30 +59,38 @@ if len(stocks) > 0:
         if data.empty:
             st.error("Erro ao baixar os dados: Nenhum dado retornado.")
         else:
-            st.header("Dados das Ações Selecionadas")
+            st.subheader("Dados das Ações Selecionadas")
             st.line_chart(data)
             
             # Calcular os retornos diários
             returns = data.pct_change().dropna()
             
-            # Cálculo do VaR
-            var_value = calculate_var(returns, confidence_level, holding_period, investment)
-            st.write(f"O Valor em Risco (VaR) é de: R$ {var_value:,.2f}")
+            # Divisão em colunas para melhor organização dos resultados
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Cálculo do VaR
+                st.subheader("Valor em Risco (VaR)")
+                var_value = calculate_var(returns, confidence_level, holding_period, investment)
+                st.metric(label="VaR Estimado", value=f"R$ {var_value:,.2f}")
 
-            # Backtest do VaR
-            st.header("Backtest do VaR")
-            var_series, breaches = backtest_var(returns, confidence_level, holding_period, investment)
-            
-            fig, ax = plt.subplots()
-            returns.plot(ax=ax, label='Retornos Diários')
-            var_series.plot(ax=ax, label='VaR')
-            ax.legend()
-            st.pyplot(fig)
-            
-            st.write(f"Número de violações: {breaches}")
+            with col2:
+                # Backtest do VaR
+                st.subheader("Backtest do VaR")
+                var_series, breaches = backtest_var(returns, confidence_level, holding_period, investment)
+                
+                fig, ax = plt.subplots()
+                returns.plot(ax=ax, label='Retornos Diários', color='blue')
+                var_series.plot(ax=ax, label='VaR', color='red')
+                ax.set_title("Backtest do VaR")
+                ax.legend()
+                st.pyplot(fig)
+                
+                st.metric(label="Número de Violações", value=breaches)
     except Exception as e:
         st.error(f"Erro ao baixar os dados: {e}")
 else:
     st.warning("Por favor, digite pelo menos um símbolo de ação.")
 
 # Rodar a aplicação com `streamlit run app.py`
+
