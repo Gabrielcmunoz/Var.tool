@@ -20,7 +20,8 @@ def backtest_var(data, confidence_level, holding_period, investment):
     breaches = 0
 
     for i in range(holding_period, len(returns)):
-        var = np.percentile(returns.iloc[i-holding_period:i], 100 * (1 - confidence_level))
+        window = returns.iloc[i-holding_period:i]
+        var = np.percentile(window, 100 * (1 - confidence_level))
         var_series.append(var)
         if returns.iloc[i] < var:
             breaches += 1
