@@ -54,27 +54,31 @@ holding_period = st.sidebar.number_input("Período de Retenção (dias):", min_v
 if len(stocks) > 0:
     try:
         data = yf.download(stocks, start="2020-01-01", end=datetime.today().strftime('%Y-%m-%d'), progress=False)['Adj Close']
-        st.header("Dados das Ações Selecionadas")
-        st.line_chart(data)
-        
-        # Cálculo do VaR
-        var_value = calculate_var(data, confidence_level, holding_period, investment)
-        st.write(f"O Valor em Risco (VaR) é de: R$ {var_value:,.2f}")
+        if data.empty:
+            st.error("Erro ao baixar os dados: Nenhum dado retornado.")
+        else:
+            st.header("Dados das Ações Selecionadas")
+            st.line_chart(data)
+            
+            # Cálculo do VaR
+            var_value = calculate_var(data, confidence_level, holding_period, investment)
+            st.write(f"O Valor em Risco (VaR) é de: R$ {var_value:,.2f}")
 
-        # Backtest do VaR
-        st.header("Backtest do VaR")
-        var_series, breaches = backtest_var(data, confidence_level, holding_period, investment)
-        
-        fig, ax = plt.subplots()
-        data.pct_change().plot(ax=ax, label='Retornos Diários')
-        var_series.plot(ax=ax, label='VaR')
-        ax.legend()
-        st.pyplot(fig)
-        
-        st.write(f"Número de violações: {breaches}")
+            # Backtest do VaR
+            st.header("Backtest do VaR")
+            var_series, breaches = backtest_var(data, confidence_level, holding_period, investment)
+            
+            fig, ax = plt.subplots()
+            data.pct_change().plot(ax=ax, label='Retornos Diários')
+            var_series.plot(ax=ax, label='VaR')
+            ax.legend()
+            st.pyplot(fig)
+            
+            st.write(f"Número de violações: {breaches}")
     except Exception as e:
         st.error(f"Erro ao baixar os dados: {e}")
 else:
     st.warning("Por favor, selecione pelo menos uma ação.")
 
 # Rodar a aplicação com `streamlit run app.py`
+
