@@ -67,4 +67,12 @@ if stocks:
         
         fig, ax = plt.subplots()
         data.pct_change().plot(ax=ax, label='Retornos Diários')
-        var_series
+        var_series.plot(ax=ax, label='VaR')
+        ax.legend()
+        st.pyplot(fig)
+        
+        st.write(f"Número de violações: {breaches}")
+    except Exception as e:
+        st.error(f"Erro ao baixar os dados: {e}")
+
+# Rodar a aplicação com `streamlit run app.py`
