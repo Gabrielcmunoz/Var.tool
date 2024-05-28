@@ -54,7 +54,7 @@ holding_period = st.sidebar.number_input("Período de Retenção (dias):", min_v
 if len(stocks) > 0:
     try:
         data = yf.download(stocks, start="2020-01-01", end=datetime.today().strftime('%Y-%m-%d'), progress=False)['Adj Close']
-        if data is None or data.empty:
+        if data.empty:
             st.error("Erro ao baixar os dados: Nenhum dado retornado.")
         else:
             st.header("Dados das Ações Selecionadas")
@@ -81,4 +81,5 @@ else:
     st.warning("Por favor, selecione pelo menos uma ação.")
 
 # Rodar a aplicação com `streamlit run app.py`
+
 
