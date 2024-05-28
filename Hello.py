@@ -6,16 +6,14 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 
 # Função para calcular o VaR
-def calculate_var(data, confidence_level, holding_period, investment):
-    returns = data.pct_change().dropna()
+def calculate_var(returns, confidence_level, holding_period, investment):
     var = np.percentile(returns, 100 * (1 - confidence_level))
     var_adj = var * np.sqrt(holding_period)
     var_value = investment * var_adj
     return var_value
 
 # Função para realizar o backtest do VaR
-def backtest_var(data, confidence_level, holding_period, investment):
-    returns = data.pct_change().dropna()
+def backtest_var(returns, confidence_level, holding_period, investment):
     var_series = []
     breaches = 0
 
@@ -59,16 +57,19 @@ if len(stocks) > 0:
             st.header("Dados das Ações Selecionadas")
             st.line_chart(data)
             
+            # Calcular os retornos diários
+            returns = data.pct_change().dropna()
+            
             # Cálculo do VaR
-            var_value = calculate_var(data, confidence_level, holding_period, investment)
+            var_value = calculate_var(returns, confidence_level, holding_period, investment)
             st.write(f"O Valor em Risco (VaR) é de: R$ {var_value:,.2f}")
 
             # Backtest do VaR
             st.header("Backtest do VaR")
-            var_series, breaches = backtest_var(data, confidence_level, holding_period, investment)
+            var_series, breaches = backtest_var(returns, confidence_level, holding_period, investment)
             
             fig, ax = plt.subplots()
-            data.pct_change().plot(ax=ax, label='Retornos Diários')
+            returns.plot(ax=ax, label='Retornos Diários')
             var_series.plot(ax=ax, label='VaR')
             ax.legend()
             st.pyplot(fig)
